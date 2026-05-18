@@ -150,7 +150,7 @@ const FlowArt: React.FC<FlowArtProps> = ({
         if ((e.deltaY > 0 && !atBottom) || (e.deltaY < 0 && !atTop)) return;
       }
       e.preventDefault();
-      if (s.animating) return;
+      if (s.animating || Math.abs(e.deltaY) < 30) return;
       goTo(s.current + Math.sign(e.deltaY));
     };
 

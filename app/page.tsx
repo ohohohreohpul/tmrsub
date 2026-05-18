@@ -1,6 +1,7 @@
 import FlowArt, { FlowSection } from '@/components/ui/story-scroll';
 import Marquee from '@/components/ui/marquee';
 import FadeIn from '@/components/ui/fade-in';
+import { ShaderBg } from '@/components/ui/shader-bg';
 import {
   Flash,
   BrainElectricity,
@@ -137,7 +138,10 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           1. HERO
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="Hero" style={{ backgroundColor: COLORS.gold.bg, color: COLORS.gold.fg }}>
+      <FlowSection aria-label="Hero" style={{ backgroundColor: '#0D3838', color: '#fff' }}>
+        {/* z-[-1] places the canvas below normal-flow children within the
+            data-flow-inner stacking context (will-change-transform). */}
+        <ShaderBg className="z-[-1]" />
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold uppercase tracking-[0.25em]">Tomorrow School</span>
           <span className="flex items-center gap-2 rounded-full border border-current/40 px-3 py-1 text-xs font-bold uppercase tracking-widest">

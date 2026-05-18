@@ -4,9 +4,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 
 // ── Tuning ─────────────────────────────────────────────────────────────────────
-const SCROLL_THRESHOLD = 700; // wheel delta needed to turn page
-const FLIP_DURATION    = 0.75; // seconds
+const SCROLL_THRESHOLD = 700;  // wheel delta needed to turn page
+const FLIP_DURATION    = 0.65; // seconds
 const DECAY            = 0.88; // accumulator decay per 80 ms tick
+// Starting tilt for the incoming card. 30° clips most of the card outside the
+// viewport, making it look like it snaps in. 8° keeps the card nearly on-screen
+// so the sweep is smooth and readable throughout the entire arc.
+const TILT_DEG         = 8;
 
 function cx(...parts: Array<string | undefined | false | null>): string {
   return parts.filter(Boolean).join(' ');
@@ -100,7 +104,7 @@ const FlowArt: React.FC<FlowArtProps> = ({
       if (inner) {
         // All inner cards start at rotation 30 (folded); section 0 starts flat.
         gsap.set(inner, {
-          rotation: i === 0 ? 0 : 30,
+          rotation: i === 0 ? 0 : TILT_DEG,
           transformOrigin: 'bottom left',
         });
       }
@@ -137,7 +141,7 @@ const FlowArt: React.FC<FlowArtProps> = ({
 
       if (reducedMotion) {
         if (nextInner) gsap.set(nextInner, { rotation: 0 });
-        if (!forward && currInner) gsap.set(currInner, { rotation: 30 });
+        if (!forward && currInner) gsap.set(currInner, { rotation: TILT_DEG });
         done();
         return;
       }
@@ -149,7 +153,7 @@ const FlowArt: React.FC<FlowArtProps> = ({
         if (nextInner) {
           gsap.fromTo(
             nextInner,
-            { rotation: 30 },
+            { rotation: TILT_DEG },
             { rotation: 0, duration: FLIP_DURATION, ease: 'power2.out', onComplete: done },
           );
         } else {
@@ -163,7 +167,7 @@ const FlowArt: React.FC<FlowArtProps> = ({
         if (nextInner) gsap.set(nextInner, { rotation: 0 });
         if (currInner) {
           gsap.to(currInner, {
-            rotation: 30,
+            rotation: TILT_DEG,
             duration: FLIP_DURATION * 0.6,
             ease: 'power2.in',
             onComplete: done,

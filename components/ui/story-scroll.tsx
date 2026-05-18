@@ -94,14 +94,17 @@ const FlowArt: React.FC<FlowArtProps> = ({
 
         if (i > 0) {
           gsap.set(inner, { rotation: 30, transformOrigin: 'bottom left' });
+          // Rotation completes only when this section's top reaches the viewport
+          // top (= the full pin travel of the previous section), so the current
+          // card stays readable throughout the scroll before being covered.
           const tween = gsap.to(inner, {
             rotation: 0,
-            ease: 'none',
+            ease: 'power1.out',
             scrollTrigger: {
               trigger: section,
               start: 'top bottom',
-              end: 'top 25%',
-              scrub: true,
+              end: 'top top',
+              scrub: 1.5,
             },
           });
           if (tween.scrollTrigger) triggers.push(tween.scrollTrigger);
@@ -112,7 +115,9 @@ const FlowArt: React.FC<FlowArtProps> = ({
             ScrollTrigger.create({
               trigger: section,
               start: 'bottom bottom',
-              end: 'bottom top',
+              // Pin for two full viewport heights so the reader has time to absorb
+              // the content before the next card finishes rotating in.
+              end: 'bottom -100%',
               pin: true,
               pinSpacing: false,
             }),

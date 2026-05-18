@@ -1,14 +1,41 @@
 import FlowArt, { FlowSection } from '@/components/ui/story-scroll';
 import Marquee from '@/components/ui/marquee';
 import FadeIn from '@/components/ui/fade-in';
+import {
+  Flash,
+  BrainElectricity,
+  Refresh,
+  LightBulb,
+  Community,
+  Laptop,
+  ChatBubble,
+  Group,
+  Network,
+  Cash,
+  MediaImage,
+  SubmitDocument,
+  MediaVideo,
+  BrightStar,
+  DesignPencil,
+  Clock,
+  Repeat,
+  Trophy,
+  Rocket,
+  BadgeCheck,
+  ArrowRight,
+  Brain,
+  Calendar,
+  MagicWand,
+  Medal,
+} from 'iconoir-react';
 
-/* ─── Design tokens ───────────────────────────────────────────────────────── */
+/* ─── Brand palette — Tomorrow School ────────────────────────────────────── */
 
 const COLORS = {
-  orange:  { bg: '#fd5200', fg: '#fff' },
-  black:   { bg: '#0d0d0d', fg: '#fff' },
-  blue:    { bg: '#1A3DE8', fg: '#fff' },
-  cream:   { bg: '#F5F0E8', fg: '#0d0d0d' },
+  teal:  { bg: '#1C7272', fg: '#fff'     },   // TMR primary teal
+  dark:  { bg: '#0D1A1A', fg: '#fff'     },   // deep teal-black
+  gold:  { bg: '#C8901E', fg: '#0D1A1A'  },   // golden amber
+  light: { bg: '#F0F6F6', fg: '#0D1A1A'  },   // off-white teal tint
 } as const;
 
 const marqueeItems = [
@@ -20,9 +47,12 @@ const marqueeItems = [
 
 /* ─── Primitive components ────────────────────────────────────────────────── */
 
-function Label({ n, children }: { n?: string; children: string }) {
+type IconComponent = React.ComponentType<{ width?: number; height?: number; strokeWidth?: number; className?: string }>;
+
+function Label({ n, children, icon: Icon }: { n?: string; children: string; icon?: IconComponent }) {
   return (
-    <p className="text-xs font-bold uppercase tracking-[0.25em] opacity-50">
+    <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.25em] opacity-50">
+      {Icon && <Icon width={13} height={13} strokeWidth={2} />}
       {n ? `${n} — ${children}` : children}
     </p>
   );
@@ -30,7 +60,6 @@ function Label({ n, children }: { n?: string; children: string }) {
 
 const Div = () => <hr className="border-t border-current/[0.12]" />;
 
-/** Big ghost decoration — large but very faint, English only */
 function Ghost({ text }: { text: string }) {
   return (
     <p
@@ -42,16 +71,19 @@ function Ghost({ text }: { text: string }) {
   );
 }
 
-/** Thai-optimised heading — max 2.5 rem so glyphs stay readable */
-function ThaiH({ children }: { children: React.ReactNode }) {
+function ThaiH({ children, icon: Icon }: { children: React.ReactNode; icon?: IconComponent }) {
   return (
-    <h2 className="text-[clamp(1.4rem,2.8vw,2.2rem)] font-bold leading-[1.3] tracking-tight">
-      {children}
+    <h2 className="flex items-start gap-3 text-[clamp(1.4rem,2.8vw,2.2rem)] font-bold leading-[1.3] tracking-tight">
+      {Icon && (
+        <span className="mt-1 shrink-0 opacity-60">
+          <Icon width={22} height={22} strokeWidth={1.5} />
+        </span>
+      )}
+      <span>{children}</span>
     </h2>
   );
 }
 
-/** Body prose: comfortable size + Thai-optimised line-height */
 function Prose({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
     <div className={`space-y-2 text-[clamp(0.95rem,1.55vw,1.15rem)] font-light leading-[1.95] ${className}`}>
@@ -60,7 +92,6 @@ function Prose({ children, className = '' }: { children: React.ReactNode; classN
   );
 }
 
-/** Two-column: ghost decoration left + content right */
 function TwoCol({ ghost, children }: { ghost: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-6 sm:flex-row sm:gap-[5vw] sm:items-start">
@@ -72,22 +103,26 @@ function TwoCol({ ghost, children }: { ghost: string; children: React.ReactNode 
   );
 }
 
-/** Arrow list item with hover slide */
 function Arrow({ children }: { children: React.ReactNode }) {
   return (
     <div className="group flex items-start gap-3 border-b border-current/10 py-2.5 transition-colors hover:border-current/30 cursor-default">
-      <span className="shrink-0 opacity-30 transition-transform group-hover:translate-x-1 group-hover:opacity-60">→</span>
+      <ArrowRight
+        className="shrink-0 mt-0.5 opacity-30 transition-all group-hover:translate-x-1 group-hover:opacity-60"
+        width={14}
+        height={14}
+        strokeWidth={2}
+      />
       <span className="text-[clamp(0.9rem,1.5vw,1.1rem)] font-light leading-[1.8]">{children}</span>
     </div>
   );
 }
 
-/** Bordered quote */
 function Quote({ children }: { children: React.ReactNode }) {
   return (
-    <div className="border border-current/20 p-5 transition-colors hover:border-current/50 cursor-default">
+    <div className="flex items-start gap-3 border border-current/20 p-5 transition-colors hover:border-current/50 cursor-default">
+      <ChatBubble className="shrink-0 mt-0.5 opacity-30" width={16} height={16} strokeWidth={1.5} />
       <p className="text-[clamp(0.95rem,1.6vw,1.2rem)] font-light italic leading-[1.9] opacity-90">
-        &ldquo;{children}&rdquo;
+        {children}
       </p>
     </div>
   );
@@ -102,11 +137,11 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           1. HERO
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="Hero" style={{ backgroundColor: COLORS.orange.bg, color: COLORS.orange.fg }}>
+      <FlowSection aria-label="Hero" style={{ backgroundColor: COLORS.gold.bg, color: COLORS.gold.fg }}>
         <div className="flex items-center justify-between">
           <span className="text-xs font-bold uppercase tracking-[0.25em]">Tomorrow School</span>
-          <span className="flex items-center gap-2 rounded-full border border-white/40 px-3 py-1 text-xs font-bold uppercase tracking-widest">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-white" />
+          <span className="flex items-center gap-2 rounded-full border border-current/40 px-3 py-1 text-xs font-bold uppercase tracking-widest">
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-current" />
             รับจำกัด 45 คน
           </span>
         </div>
@@ -130,11 +165,12 @@ export default function Home() {
         <FadeIn delay={200}>
           <div className="flex flex-wrap gap-3">
             {[
-              { v: '4 วัน',     s: 'Live Cowork' },
-              { v: '45 คน',     s: 'จำกัด' },
-              { v: '1,290 บาท', s: 'ราคา Camp' },
-            ].map(({ v, s }) => (
-              <div key={v} className="flex-1 min-w-[110px] border border-white/30 p-4 transition-colors hover:border-white/60 cursor-default">
+              { v: '4 วัน',     s: 'Live Cowork',   icon: Calendar },
+              { v: '45 คน',     s: 'จำกัด',          icon: Group },
+              { v: '1,290 บาท', s: 'ราคา Camp',      icon: Medal },
+            ].map(({ v, s, icon: Icon }) => (
+              <div key={v} className="flex-1 min-w-[110px] border border-current/30 p-4 transition-colors hover:border-current/60 cursor-default">
+                <Icon width={16} height={16} strokeWidth={1.8} className="mb-2 opacity-50" />
                 <p className="text-[clamp(1.2rem,3vw,2rem)] font-bold leading-none">{v}</p>
                 <p className="mt-1 text-[0.65rem] font-bold uppercase tracking-widest opacity-55">{s}</p>
               </div>
@@ -148,12 +184,12 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           2. AI มาเร็วเกินไป
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="AI มาเร็ว" style={{ backgroundColor: COLORS.black.bg, color: COLORS.black.fg }}>
-        <Label n="01">คุณเคยรู้สึกไหมว่า…</Label>
+      <FlowSection aria-label="AI มาเร็ว" style={{ backgroundColor: COLORS.dark.bg, color: COLORS.dark.fg }}>
+        <Label n="01" icon={Flash}>คุณเคยรู้สึกไหมว่า…</Label>
         <Div />
         <FadeIn>
           <TwoCol ghost="01">
-            <ThaiH>AI มันมาเร็วเกินไป</ThaiH>
+            <ThaiH icon={Flash}>AI มันมาเร็วเกินไป</ThaiH>
             <Prose>
               <p>เมื่อวานเพิ่งมีคนพูดถึง ChatGPT</p>
               <p>วันนี้มี Claude</p>
@@ -174,23 +210,25 @@ export default function Home() {
           </TwoCol>
         </FadeIn>
         <FadeIn delay={200}>
-          <p className="text-[clamp(1.5rem,4vw,3.5rem)] font-bold leading-tight">
-            ทุกอย่างดูน่าตื่นเต้นมาก
-            <span className="opacity-50"> แต่ในขณะเดียวกัน มันก็</span>
-            <span> โคตร overwhelming</span>
-          </p>
+          <Prose>
+            <p className="text-[clamp(1.5rem,4vw,3.5rem)] font-bold leading-tight">
+              ทุกอย่างดูน่าตื่นเต้นมาก
+              <span className="opacity-50"> แต่ในขณะเดียวกัน มันก็</span>
+              <span> โคตร overwhelming</span>
+            </p>
+          </Prose>
         </FadeIn>
       </FlowSection>
 
       {/* ══════════════════════════════════════════════════
           3. วงจรที่คุ้นเคย
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="วงจรที่คุ้นเคย" style={{ backgroundColor: COLORS.blue.bg, color: COLORS.blue.fg }}>
-        <Label n="02">วงจรที่คุ้นเคย</Label>
+      <FlowSection aria-label="วงจรที่คุ้นเคย" style={{ backgroundColor: COLORS.teal.bg, color: COLORS.teal.fg }}>
+        <Label n="02" icon={Refresh}>วงจรที่คุ้นเคย</Label>
         <Div />
         <FadeIn>
           <TwoCol ghost="WHY">
-            <ThaiH>หลายคนเริ่มจากความรู้สึกว่า</ThaiH>
+            <ThaiH icon={Refresh}>หลายคนเริ่มจากความรู้สึกว่า</ThaiH>
             <div className="border border-white/25 p-4">
               <Prose>
                 <p className="font-semibold">&ldquo;โอเค เราต้องเรียน AI แล้วแหละ&rdquo;</p>
@@ -216,12 +254,12 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           4. ยังไม่ได้สร้างระบบ
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="ยังไม่ได้สร้างระบบ" style={{ backgroundColor: COLORS.cream.bg, color: COLORS.cream.fg }}>
-        <Label n="03">ผ่านไปหลายเดือน</Label>
+      <FlowSection aria-label="ยังไม่ได้สร้างระบบ" style={{ backgroundColor: COLORS.light.bg, color: COLORS.light.fg }}>
+        <Label n="03" icon={LightBulb}>ผ่านไปหลายเดือน</Label>
         <Div />
         <FadeIn>
           <TwoCol ghost="03">
-            <ThaiH><strong>ยังไม่ได้สร้างระบบ<br />อะไรของตัวเองจริงๆ</strong></ThaiH>
+            <ThaiH icon={LightBulb}><strong>ยังไม่ได้สร้างระบบ<br />อะไรของตัวเองจริงๆ</strong></ThaiH>
             <Prose>
               <p>ยังใช้ AI แบบถามตอบอยู่</p>
               <p>ยังให้ AI ช่วยเขียน caption เป็นครั้งๆ</p>
@@ -247,12 +285,12 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           5. AI ควรเป็นเพื่อนร่วมงาน
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="AI เพื่อนร่วมงาน" style={{ backgroundColor: COLORS.black.bg, color: COLORS.black.fg }}>
-        <Label n="04">ทางออก</Label>
+      <FlowSection aria-label="AI เพื่อนร่วมงาน" style={{ backgroundColor: COLORS.dark.bg, color: COLORS.dark.fg }}>
+        <Label n="04" icon={Community}>ทางออก</Label>
         <Div />
         <FadeIn>
           <TwoCol ghost="AI">
-            <ThaiH>AI ไม่ควรเป็นแค่เครื่องมือที่เราถามเวลาต้องการคำตอบ</ThaiH>
+            <ThaiH icon={Community}>AI ไม่ควรเป็นแค่เครื่องมือที่เราถามเวลาต้องการคำตอบ</ThaiH>
             <Prose>
               <p>แต่ AI ควรกลายเป็น <strong>&ldquo;เพื่อนร่วมงาน&rdquo;</strong></p>
               <p className="opacity-60">ที่ช่วยคิด</p>
@@ -279,8 +317,8 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           6. Claude Cowork คืออะไร
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="Claude Cowork" style={{ backgroundColor: COLORS.orange.bg, color: COLORS.orange.fg }}>
-        <Label n="05">Claude Cowork</Label>
+      <FlowSection aria-label="Claude Cowork" style={{ backgroundColor: COLORS.teal.bg, color: COLORS.teal.fg }}>
+        <Label n="05" icon={Laptop}>Claude Cowork</Label>
         <Div />
         <FadeIn>
           <h2 className="text-[clamp(3rem,10vw,11rem)] font-bold leading-[0.85] uppercase tracking-tight">
@@ -313,8 +351,8 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           7. ทำไมต้อง Claude
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="ทำไมต้อง Claude" style={{ backgroundColor: COLORS.blue.bg, color: COLORS.blue.fg }}>
-        <Label n="06">ทำไมต้อง Claude?</Label>
+      <FlowSection aria-label="ทำไมต้อง Claude" style={{ backgroundColor: COLORS.gold.bg, color: COLORS.gold.fg }}>
+        <Label n="06" icon={BrainElectricity}>ทำไมต้อง Claude?</Label>
         <Div />
         <FadeIn>
           <h2 className="text-[clamp(3rem,10vw,11rem)] font-bold leading-[0.85] uppercase tracking-tight">
@@ -352,8 +390,8 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           8. เหมาะกับใคร — quotes
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="เหมาะกับใคร" style={{ backgroundColor: COLORS.cream.bg, color: COLORS.cream.fg }}>
-        <Label n="07">Camp นี้เหมาะกับใคร?</Label>
+      <FlowSection aria-label="เหมาะกับใคร" style={{ backgroundColor: COLORS.light.bg, color: COLORS.light.fg }}>
+        <Label n="07" icon={ChatBubble}>Camp นี้เหมาะกับใคร?</Label>
         <Div />
         <FadeIn>
           <h2 className="text-[clamp(3rem,10vw,11rem)] font-bold leading-[0.85] uppercase tracking-tight">
@@ -380,8 +418,8 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           9. กลุ่มเป้าหมาย
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="กลุ่มเป้าหมาย" style={{ backgroundColor: COLORS.black.bg, color: COLORS.black.fg }}>
-        <Label n="08">ถ้าคุณเป็นแบบนี้</Label>
+      <FlowSection aria-label="กลุ่มเป้าหมาย" style={{ backgroundColor: COLORS.dark.bg, color: COLORS.dark.fg }}>
+        <Label n="08" icon={Group}>ถ้าคุณเป็นแบบนี้</Label>
         <Div />
         <FadeIn>
           <div className="flex flex-col sm:flex-row gap-[4vw]">
@@ -412,8 +450,8 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           10. สิ่งที่เราจะสร้าง
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="สิ่งที่จะสร้าง" style={{ backgroundColor: COLORS.blue.bg, color: COLORS.blue.fg }}>
-        <Label n="09">สิ่งที่เราจะสร้างใน Camp นี้</Label>
+      <FlowSection aria-label="สิ่งที่จะสร้าง" style={{ backgroundColor: COLORS.teal.bg, color: COLORS.teal.fg }}>
+        <Label n="09" icon={Network}>สิ่งที่เราจะสร้างใน Camp นี้</Label>
         <Div />
         <FadeIn>
           <h2 className="text-[clamp(3rem,10vw,11rem)] font-bold leading-[0.85] uppercase tracking-tight">
@@ -453,12 +491,12 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           11. WF 1 — Affiliate
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="Workflow 1" style={{ backgroundColor: COLORS.cream.bg, color: COLORS.cream.fg }}>
-        <Label>Workflow 01</Label>
+      <FlowSection aria-label="Workflow 1" style={{ backgroundColor: COLORS.light.bg, color: COLORS.light.fg }}>
+        <Label icon={Cash}>Workflow 01</Label>
         <Div />
         <FadeIn>
           <TwoCol ghost="01">
-            <ThaiH>Affiliate Content Factory</ThaiH>
+            <ThaiH icon={Cash}>Affiliate Content Factory</ThaiH>
             <Prose>
               <p>หลายคนอยากเริ่ม affiliate — Shopee, Lazada, TikTok Shop</p>
               <p className="opacity-60">แต่ปัญหาคือ:</p>
@@ -485,12 +523,12 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           12. WF 2 — Photostock
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="Workflow 2" style={{ backgroundColor: COLORS.black.bg, color: COLORS.black.fg }}>
-        <Label>Workflow 02</Label>
+      <FlowSection aria-label="Workflow 2" style={{ backgroundColor: COLORS.dark.bg, color: COLORS.dark.fg }}>
+        <Label icon={MediaImage}>Workflow 02</Label>
         <Div />
         <FadeIn>
           <TwoCol ghost="02">
-            <ThaiH>Photostock Generation & Upload</ThaiH>
+            <ThaiH icon={MediaImage}>Photostock Generation & Upload</ThaiH>
             <Prose>
               <p>ตลาด stock content เข้าใจง่าย: สร้าง asset → ใส่ keyword → อัปโหลด → รอให้คนซื้อ</p>
               <p className="opacity-60">แต่ถ้าทำแบบไม่มีระบบ มันจะเหนื่อยมาก</p>
@@ -517,12 +555,12 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           13. WF 3 — Resume
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="Workflow 3" style={{ backgroundColor: COLORS.orange.bg, color: COLORS.orange.fg }}>
-        <Label>Workflow 03</Label>
+      <FlowSection aria-label="Workflow 3" style={{ backgroundColor: COLORS.teal.bg, color: COLORS.teal.fg }}>
+        <Label icon={SubmitDocument}>Workflow 03</Label>
         <Div />
         <FadeIn>
           <TwoCol ghost="03">
-            <ThaiH>AI Resume & Job Hunter</ThaiH>
+            <ThaiH icon={SubmitDocument}>AI Resume & Job Hunter</ThaiH>
             <Prose>
               <p>สำหรับนักศึกษา คนหางาน หรือคนที่อยากเปลี่ยนสายงาน</p>
               <p className="opacity-70">ปัญหาส่วนใหญ่: resume ไม่ตรง JD · cover letter generic · LinkedIn ไม่ชัด · ไม่รู้จะ research บริษัทยังไง</p>
@@ -544,12 +582,12 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           14. WF 4 — YouTube Shorts
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="Workflow 4" style={{ backgroundColor: COLORS.blue.bg, color: COLORS.blue.fg }}>
-        <Label>Workflow 04</Label>
+      <FlowSection aria-label="Workflow 4" style={{ backgroundColor: COLORS.gold.bg, color: COLORS.gold.fg }}>
+        <Label icon={MediaVideo}>Workflow 04</Label>
         <Div />
         <FadeIn>
           <TwoCol ghost="04">
-            <ThaiH>YouTube Shorts Factory</ThaiH>
+            <ThaiH icon={MediaVideo}>YouTube Shorts Factory</ThaiH>
             <Prose>
               <p>Short-form video คือหนึ่งในช่องทางที่ทรงพลังที่สุดตอนนี้</p>
               <p className="opacity-70">แต่หลายคนทำได้ 3 คลิปแล้วหยุด — เพราะไม่มีระบบ</p>
@@ -576,12 +614,12 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           15. WF 5 — Personal Brand
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="Workflow 5" style={{ backgroundColor: COLORS.cream.bg, color: COLORS.cream.fg }}>
-        <Label>Workflow 05</Label>
+      <FlowSection aria-label="Workflow 5" style={{ backgroundColor: COLORS.light.bg, color: COLORS.light.fg }}>
+        <Label icon={BrightStar}>Workflow 05</Label>
         <Div />
         <FadeIn>
           <TwoCol ghost="05">
-            <ThaiH>Creator Personal Brand System</ThaiH>
+            <ThaiH icon={BrightStar}>Creator Personal Brand System</ThaiH>
             <Prose>
               <p>คำถามที่หลายคนเจอเมื่อจะเริ่ม personal brand:</p>
               <p className="opacity-70">เราควรพูดเรื่องอะไร? ใครคือ audience? โพสต์แบบไหนถึงจะเป็นเรา?</p>
@@ -606,12 +644,12 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           16. WF 6 — Content Generation
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="Workflow 6" style={{ backgroundColor: COLORS.black.bg, color: COLORS.black.fg }}>
-        <Label>Workflow 06</Label>
+      <FlowSection aria-label="Workflow 6" style={{ backgroundColor: COLORS.dark.bg, color: COLORS.dark.fg }}>
+        <Label icon={DesignPencil}>Workflow 06</Label>
         <Div />
         <FadeIn>
           <TwoCol ghost="06">
-            <ThaiH>Content Generation Workflow</ThaiH>
+            <ThaiH icon={DesignPencil}>Content Generation Workflow</ThaiH>
             <Prose>
               <p>นี่คือ workflow หลักที่หลายคนสามารถเอาไปใช้ได้ทันที</p>
             </Prose>
@@ -640,12 +678,12 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           17. WF 7 — Scheduled Tasks
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="Workflow 7" style={{ backgroundColor: COLORS.orange.bg, color: COLORS.orange.fg }}>
-        <Label>Workflow 07 — หัวใจของ Camp</Label>
+      <FlowSection aria-label="Workflow 7" style={{ backgroundColor: COLORS.teal.bg, color: COLORS.teal.fg }}>
+        <Label icon={Clock}>Workflow 07 — หัวใจของ Camp</Label>
         <Div />
         <FadeIn>
           <TwoCol ghost="07">
-            <ThaiH>Claude Scheduled Tasks</ThaiH>
+            <ThaiH icon={Clock}>Claude Scheduled Tasks</ThaiH>
             <Prose>
               <p>แทนที่เราจะเข้าไปถาม AI ทุกครั้ง —</p>
               <p>เราจะเริ่มคิดว่า: <strong>มีงานอะไรบ้างที่ AI ควรช่วยเราทำเป็นประจำ?</strong></p>
@@ -670,12 +708,12 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           18. WF 8 — Automation Mindset
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="Workflow 8" style={{ backgroundColor: COLORS.blue.bg, color: COLORS.blue.fg }}>
-        <Label>Workflow 08</Label>
+      <FlowSection aria-label="Workflow 8" style={{ backgroundColor: COLORS.gold.bg, color: COLORS.gold.fg }}>
+        <Label icon={Repeat}>Workflow 08</Label>
         <Div />
         <FadeIn>
           <TwoCol ghost="08">
-            <ThaiH>Automation Mindset</ThaiH>
+            <ThaiH icon={Repeat}>Automation Mindset</ThaiH>
             <Prose>
               <p>ก่อนจะใช้ automation เป็น เราต้องคิดเป็นก่อน</p>
               <p className="opacity-70">งานซ้ำคือโอกาส · งานที่มี pattern = workflow</p>
@@ -690,7 +728,7 @@ export default function Home() {
               ].map(({ from, to }) => (
                 <div key={from} className="flex items-center gap-3">
                   <p className="text-[clamp(0.75rem,1.2vw,0.9rem)] opacity-50">{from}</p>
-                  <span className="opacity-30 shrink-0">→</span>
+                  <ArrowRight className="opacity-30 shrink-0" width={12} height={12} strokeWidth={2} />
                   <p className="text-[clamp(0.75rem,1.2vw,0.9rem)] font-semibold">{to}</p>
                 </div>
               ))}
@@ -705,8 +743,8 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           19. รูปแบบการเรียน
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="รูปแบบ" style={{ backgroundColor: COLORS.cream.bg, color: COLORS.cream.fg }}>
-        <Label n="10">รูปแบบการเรียน</Label>
+      <FlowSection aria-label="รูปแบบ" style={{ backgroundColor: COLORS.light.bg, color: COLORS.light.fg }}>
+        <Label n="10" icon={Laptop}>รูปแบบการเรียน</Label>
         <Div />
         <FadeIn>
           <h2 className="text-[clamp(3rem,10vw,11rem)] font-bold leading-[0.85] uppercase tracking-tight">
@@ -751,8 +789,8 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           20. สิ่งที่ได้รับ + ไม่เหมาะ
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="สิ่งที่ได้รับ" style={{ backgroundColor: COLORS.black.bg, color: COLORS.black.fg }}>
-        <Label n="11">สิ่งที่คุณจะได้รับ</Label>
+      <FlowSection aria-label="สิ่งที่ได้รับ" style={{ backgroundColor: COLORS.dark.bg, color: COLORS.dark.fg }}>
+        <Label n="11" icon={Trophy}>สิ่งที่คุณจะได้รับ</Label>
         <Div />
         <FadeIn>
           <div className="flex flex-col sm:flex-row gap-[4vw]">
@@ -763,7 +801,7 @@ export default function Home() {
                 'Claude workflow templates', 'LINE Community',
                 'Certificate จาก Tomorrow School', 'Recordings', 'แนวทางต่อยอดหลังจบ camp'].map((item) => (
                 <div key={item} className="group flex items-center gap-3 border-b border-white/10 py-2.5 hover:border-white/30 cursor-default transition-colors">
-                  <span className="text-white/40 shrink-0 group-hover:text-white/70 transition-colors text-sm font-bold">✓</span>
+                  <BadgeCheck className="shrink-0 opacity-30 group-hover:opacity-60 transition-colors" width={14} height={14} strokeWidth={1.8} />
                   <span className="text-[clamp(0.8rem,1.3vw,1rem)] font-light">{item}</span>
                 </div>
               ))}
@@ -789,8 +827,8 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           21. ทำไมต้องตอนนี้
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="ทำไมตอนนี้" style={{ backgroundColor: COLORS.orange.bg, color: COLORS.orange.fg }}>
-        <Label n="12">ทำไมต้องเรียนตอนนี้?</Label>
+      <FlowSection aria-label="ทำไมตอนนี้" style={{ backgroundColor: COLORS.teal.bg, color: COLORS.teal.fg }}>
+        <Label n="12" icon={Rocket}>ทำไมต้องเรียนตอนนี้?</Label>
         <Div />
         <FadeIn>
           <h2 className="text-[clamp(3rem,10vw,11rem)] font-bold leading-[0.85] uppercase tracking-tight">
@@ -832,11 +870,11 @@ export default function Home() {
       {/* ══════════════════════════════════════════════════
           22. CTA
       ══════════════════════════════════════════════════ */}
-      <FlowSection aria-label="CTA" style={{ backgroundColor: COLORS.black.bg, color: COLORS.black.fg }}>
+      <FlowSection aria-label="CTA" style={{ backgroundColor: COLORS.gold.bg, color: COLORS.gold.fg }}>
         <div className="flex items-center justify-between">
-          <Label n="13">พร้อมแล้ว เริ่มได้เลย</Label>
-          <span className="flex items-center gap-2 rounded-full border border-white/30 px-3 py-1 text-xs font-bold uppercase tracking-widest">
-            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-white" />
+          <Label n="13" icon={Rocket}>พร้อมแล้ว เริ่มได้เลย</Label>
+          <span className="flex items-center gap-2 rounded-full border border-current/30 px-3 py-1 text-xs font-bold uppercase tracking-widest">
+            <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-current" />
             รับจำกัด 45 คน
           </span>
         </div>
@@ -854,12 +892,13 @@ export default function Home() {
         <FadeIn delay={100}>
           <div className="flex flex-wrap gap-3">
             {[
-              { v: '4 วัน', s: 'ระยะเวลา' },
-              { v: 'Live Online Cowork', s: 'รูปแบบ' },
-              { v: 'จำกัด 45 คน', s: 'จำนวนรับ' },
-              { v: 'Certificate', s: 'Tomorrow School' },
-            ].map(({ v, s }) => (
-              <div key={v} className="flex-1 min-w-[130px] border border-white/15 p-4 hover:border-white/40 transition-colors cursor-default">
+              { v: '4 วัน',             s: 'ระยะเวลา',         icon: Calendar },
+              { v: 'Live Online Cowork', s: 'รูปแบบ',           icon: Laptop },
+              { v: 'จำกัด 45 คน',       s: 'จำนวนรับ',         icon: Group },
+              { v: 'Certificate',        s: 'Tomorrow School', icon: Trophy },
+            ].map(({ v, s, icon: Icon }) => (
+              <div key={v} className="flex-1 min-w-[130px] border border-current/15 p-4 hover:border-current/40 transition-colors cursor-default">
+                <Icon width={16} height={16} strokeWidth={1.8} className="mb-2 opacity-40" />
                 <p className="text-[clamp(0.9rem,1.7vw,1.2rem)] font-bold leading-snug">{v}</p>
                 <p className="mt-1 text-[0.6rem] font-bold uppercase tracking-widest opacity-40">{s}</p>
               </div>

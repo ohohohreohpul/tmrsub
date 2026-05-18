@@ -3,9 +3,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 
-// ── Tuning ─────────────────────────────────────────────────────────────────────
-const FLIP_DURATION = 1.1;  // seconds — slow, cinematic sweep
-const TILT_DEG      = 8;    // starting tilt; small enough to stay on-screen
+const FORWARD_DURATION  = 1.0;  // seconds
+const BACKWARD_DURATION = 0.65;
 
 function cx(...parts: Array<string | undefined | false | null>): string {
   return parts.filter(Boolean).join(' ');
@@ -26,8 +25,6 @@ export const FlowSection: React.FC<FlowSectionProps> = ({
   children,
   'aria-label': ariaLabel,
 }) => {
-  // backgroundColor goes on the inner div only — outer section stays transparent
-  // so that during the rotation the active section below shows through.
   const { backgroundColor, color, ...innerStyle } = style as React.CSSProperties & {
     backgroundColor?: string;
     color?: string;
@@ -45,7 +42,7 @@ export const FlowSection: React.FC<FlowSectionProps> = ({
           'flow-art-container relative flex h-full w-full flex-col justify-between gap-6',
           'px-[4vw] pt-[clamp(2rem,8vw,4vw)] pb-[4vw] overflow-y-auto will-change-transform',
         )}
-        style={{ transformOrigin: 'bottom left', backgroundColor, color, ...innerStyle }}
+        style={{ backgroundColor, color, ...innerStyle }}
       >
         {children}
       </div>
@@ -81,19 +78,15 @@ const FlowArt: React.FC<FlowArtProps> = ({
 
     const s = { current: 0, animating: false };
 
-    // ── z-index helpers ──────────────────────────────────────────────────────
-    // Only 1–2 sections are ever visible at a time:
-    //   z=2  active section
-    //   z=3  incoming (forward animation)
-    //   z=1  outgoing (backward animation, revealed below)
-    //   z=0  everything else
     const show = (idx: number) => gsap.set(sections[idx], { zIndex: 2 });
     const hide = (idx: number) => gsap.set(sections[idx], { zIndex: 0 });
 
+    // All sections start translated fully below the viewport; only section 0 is
+    // in place and visible.
     sections.forEach((sec, i) => {
       gsap.set(sec, { zIndex: 0 });
       const inner = sec.querySelector<HTMLElement>('.flow-art-container');
-      if (inner) gsap.set(inner, { rotation: i === 0 ? 0 : TILT_DEG, transformOrigin: 'bottom left' });
+      if (inner) gsap.set(inner, { y: i === 0 ? '0%' : '100%' });
     });
     show(0);
 
@@ -119,31 +112,33 @@ const FlowArt: React.FC<FlowArtProps> = ({
       };
 
       if (reducedMotion) {
-        if (nextInner) gsap.set(nextInner, { rotation: 0 });
-        if (!forward && currInner) gsap.set(currInner, { rotation: TILT_DEG });
+        if (nextInner) gsap.set(nextInner, { y: '0%' });
+        if (!forward && currInner) gsap.set(currInner, { y: '100%' });
         done();
         return;
       }
 
       if (forward) {
+        // Next card slides up from below the current card.
         gsap.set(currSec, { zIndex: 2 });
         gsap.set(nextSec, { zIndex: 3 });
         if (nextInner) {
           gsap.fromTo(
             nextInner,
-            { rotation: TILT_DEG },
-            { rotation: 0, duration: FLIP_DURATION, ease: 'power2.inOut', onComplete: done },
+            { y: '100%' },
+            { y: '0%', duration: FORWARD_DURATION, ease: 'expo.out', onComplete: done },
           );
         } else done();
       } else {
+        // Current card slides back down, revealing the one below.
         gsap.set(nextSec, { zIndex: 1 });
         gsap.set(currSec, { zIndex: 2 });
-        if (nextInner) gsap.set(nextInner, { rotation: 0 });
+        if (nextInner) gsap.set(nextInner, { y: '0%' });
         if (currInner) {
           gsap.to(currInner, {
-            rotation: TILT_DEG,
-            duration: FLIP_DURATION * 0.7,
-            ease: 'power2.inOut',
+            y: '100%',
+            duration: BACKWARD_DURATION,
+            ease: 'power3.in',
             onComplete: done,
           });
         } else done();
@@ -152,9 +147,8 @@ const FlowArt: React.FC<FlowArtProps> = ({
 
     goToRef.current = goTo;
 
-    // ── Wheel — one scroll event = one page turn ─────────────────────────────
+    // ── Wheel — one event = one turn (blocked while animating) ───────────────
     const onWheel = (e: WheelEvent) => {
-      // Let content scroll internally if it hasn't reached its boundary yet.
       const inner = (e.target as HTMLElement).closest<HTMLElement>('.flow-art-container');
       if (inner) {
         const atBottom = inner.scrollTop + inner.clientHeight >= inner.scrollHeight - 2;

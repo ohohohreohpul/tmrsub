@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 
 const FORWARD_DURATION  = 1.0;  // seconds
@@ -63,10 +63,7 @@ const FlowArt: React.FC<FlowArtProps> = ({
   className,
   'aria-label': ariaLabel = 'Story scroll',
 }) => {
-  const wrapRef  = useRef<HTMLDivElement>(null);
-  const goToRef  = useRef<(n: number) => void>(() => {});
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const sectionCount = React.Children.count(children);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const wrap = wrapRef.current;
@@ -108,7 +105,6 @@ const FlowArt: React.FC<FlowArtProps> = ({
         show(next);
         s.current   = next;
         s.animating = false;
-        setCurrentIdx(next);
       };
 
       if (reducedMotion) {
@@ -145,8 +141,6 @@ const FlowArt: React.FC<FlowArtProps> = ({
       }
     };
 
-    goToRef.current = goTo;
-
     // ── Wheel — one event = one turn (blocked while animating) ───────────────
     const onWheel = (e: WheelEvent) => {
       const inner = (e.target as HTMLElement).closest<HTMLElement>('.flow-art-container');
@@ -156,7 +150,7 @@ const FlowArt: React.FC<FlowArtProps> = ({
         if ((e.deltaY > 0 && !atBottom) || (e.deltaY < 0 && !atTop)) return;
       }
       e.preventDefault();
-      if (s.animating || Math.abs(e.deltaY) < 10) return;
+      if (s.animating) return;
       goTo(s.current + Math.sign(e.deltaY));
     };
 
@@ -195,27 +189,6 @@ const FlowArt: React.FC<FlowArtProps> = ({
       <div ref={wrapRef} className="relative h-full w-full">
         {children}
       </div>
-
-      {/* Dot navigator */}
-      <nav
-        aria-label="Section navigation"
-        className="pointer-events-auto fixed right-4 top-1/2 z-50 flex -translate-y-1/2 flex-col gap-[7px]"
-      >
-        {Array.from({ length: sectionCount }, (_, i) => (
-          <button
-            key={i}
-            onClick={() => goToRef.current(i)}
-            className={cx(
-              'rounded-full transition-all duration-300',
-              i === currentIdx
-                ? 'h-3 w-1.5 bg-white opacity-80'
-                : 'h-1.5 w-1.5 bg-white opacity-25 hover:opacity-55',
-            )}
-            aria-label={`Go to section ${i + 1}`}
-            aria-current={i === currentIdx ? 'true' : undefined}
-          />
-        ))}
-      </nav>
     </div>
   );
 };

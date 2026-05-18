@@ -23,24 +23,33 @@ export const FlowSection: React.FC<FlowSectionProps> = ({
   style = {},
   children,
   'aria-label': ariaLabel,
-}) => (
-  <section
-    data-flow-section
-    aria-label={ariaLabel}
-    className={cx('relative min-h-screen w-full overflow-hidden', className)}
-  >
-    <div
-      data-flow-inner
-      className={cx(
-        'flow-art-container relative flex min-h-screen w-full flex-col justify-between gap-6 px-[4vw] pt-[clamp(2rem,8vw,4vw)] pb-[4vw]',
-        'will-change-transform',
-      )}
-      style={{ transformOrigin: 'bottom left', ...style }}
+}) => {
+  // Pull bg/color onto the outer section so the opaque shell hides the pinned
+  // section below before the inner div has fully rotated into position.
+  const { backgroundColor, color, ...innerStyle } = style as React.CSSProperties & {
+    backgroundColor?: string;
+    color?: string;
+  };
+  return (
+    <section
+      data-flow-section
+      aria-label={ariaLabel}
+      className={cx('relative min-h-screen w-full overflow-hidden', className)}
+      style={{ backgroundColor, color }}
     >
-      {children}
-    </div>
-  </section>
-);
+      <div
+        data-flow-inner
+        className={cx(
+          'flow-art-container relative flex min-h-screen w-full flex-col justify-between gap-6 px-[4vw] pt-[clamp(2rem,8vw,4vw)] pb-[4vw]',
+          'will-change-transform',
+        )}
+        style={{ transformOrigin: 'bottom left', backgroundColor, color, ...innerStyle }}
+      >
+        {children}
+      </div>
+    </section>
+  );
+};
 
 export interface FlowArtProps {
   children: React.ReactNode;
